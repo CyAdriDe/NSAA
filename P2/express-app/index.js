@@ -18,6 +18,8 @@ const bodyParser = require('body-parser');
 
 //OAuth
 const OAuth = require('./oauth');
+//OIDC
+const Oidc = require('./oidc');
 
 const app = express()
 const port = process.env.NODE_DOCKER_PORT || 3000
@@ -28,6 +30,7 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended: true })) // needed to retrieve html form fields (it's a requirement of the local strategy)
 
 passport.use('oauth2', OAuth());
+passport.use('oidc', Oidc);
 
 passport.use('hashed-passwords', 
 	new LocalStrategy(
@@ -191,6 +194,17 @@ app.get('/auth/github/callback',
     res.cookie('session', token, {httpOnly: true,
             secure: true}
     ) 
+    res.redirect('/')
+  });
+
+app.get('/auth/oidc', passport.authenticate('oidc', { session: false }));
+
+app.get('/auth/oidc/callback',
+  passport.authenticate('oidc', { failureRedirect: '/login', session: false }),
+  function (req, res) {
+    const token = tokenGenerator(req.user.username, jwtSecret)
+
+    res.cookie('jwt', token, { httpOnly: true, secure: true })
     res.redirect('/')
   });
 
