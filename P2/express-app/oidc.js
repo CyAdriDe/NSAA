@@ -1,6 +1,6 @@
 const OpenIDStrategy = require('passport-auth0-openidconnect').Strategy
 
-const oidc = new OpenIDStrategy({
+const oidcStrategy = new OpenIDStrategy({
   domain: 'dev-017jy36e7crwekzm.us.auth0.com',
   clientID: '5UXcOEtthjlnYmriLVH3GPe6vpr1UOA7',
   clientSecret: 'p0KTA-k96JA4KSF1PydACIPm7gs06DmDxbxrgZUd9a4UQC9hHfvfw3YGfBxNq4Bx',
@@ -16,4 +16,4 @@ const oidc = new OpenIDStrategy({
   }
 )
 
-module.exports = oidc
+module.exports = oidcStrategy

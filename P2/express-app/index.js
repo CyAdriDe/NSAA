@@ -19,7 +19,8 @@ const bodyParser = require('body-parser');
 //OAuth
 const OAuth = require('./oauth');
 //OIDC
-const Oidc = require('./oidc');
+const oidcStrategy = require('./oidc');
+const session = require('express-session'); //Session for the OIDC
 
 const app = express()
 const port = process.env.NODE_DOCKER_PORT || 3000
@@ -30,7 +31,14 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended: true })) // needed to retrieve html form fields (it's a requirement of the local strategy)
 
 passport.use('oauth2', OAuth());
-passport.use('oidc', Oidc);
+passport.use('oidc', oidcStrategy);
+// Session for the OIDC
+app.use(session({
+  secret: 'nsaa-passport',
+  resave: false,
+  saveUninitialized: true
+}))
+
 
 passport.use('hashed-passwords', 
 	new LocalStrategy(
@@ -202,9 +210,18 @@ app.get('/auth/oidc', passport.authenticate('oidc', { session: false }));
 app.get('/auth/oidc/callback',
   passport.authenticate('oidc', { failureRedirect: '/login', session: false }),
   function (req, res) {
-    const token = tokenGenerator(req.user.username, jwtSecret)
+  
+    const jwtClaims = {
+      sub: req.user.username,
+      iss: 'localhost:3000',
+      aud: 'localhost:3000',
+      exp: Math.floor(Date.now() / 1000) + 604800, // 1 week (7×24×60×60=604800s) from now
+      role: 'user', // just to show a private JWT field
+      exam: 'Soria'
+    }
+    const token = jwt.sign(jwtClaims, jwtSecret)
 
-    res.cookie('jwt', token, { httpOnly: true, secure: true })
+    res.cookie('session', token, { httpOnly: true, secure: true })
     res.redirect('/')
   });
 
