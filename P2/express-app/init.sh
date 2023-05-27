@@ -16,9 +16,11 @@ echo "Permission for freeradius correctly added"
 # Make a copy of the old eap file and users file and put ours.
 sudo cp /etc/freeradius/3.0/mods-enabled/eap ~/eap-bck.bck && \
 sudo cp /etc/freeradius/3.0/users ~/users-bck.bck && \
+sudo cp /etc/freeradius/3.0/proxy.conf ~/proxy-bck.conf && \
 echo "Created backup files in ~" &&\
 sudo cp radius/users /etc/freeradius/3.0/ && \
 sudo cp radius/eap /etc/freeradius/3.0/mods-enabled/ && \
+sudo cp radius/proxy.conf /etc/freeradius/3.0/ && \
 echo "New files in radius directory, starting freeradius in debbuging mode..." && \
 echo "" && \
 sudo freeradius -X

@@ -12,8 +12,8 @@ const {
 
 const radiusStrategy = new LocalStrategy(
   {
-    usernameField: 'walrus',
-    passwordField: 'walrus',
+    usernameField: 'username',
+    passwordField: 'password',
     session: false
   },
   async function (username, password, done) {
@@ -26,7 +26,7 @@ const radiusStrategy = new LocalStrategy(
 
     try {
       const result = await client.accessRequest({
-        secret: 'nsaa-radius',
+        secret: 'testing123',
         attributes: [
           [attributes.USER_NAME, username],
           [attributes.USER_PASSWORD, password],

@@ -1,7 +1,7 @@
 <body>
     <p><strong>Want to listen to the fortune-teller server?</strong></p>
     <p>Please login to proceed</p>
-    <form action="/login" method="post">
+    <form action="/login" method="post" id="login_form">
         <div>
             <label>Username:</label>
             <input type="text" name="username" />
@@ -12,6 +12,7 @@
         </div>
         <div>
             <input type="submit" value="Log In" />
+            <button type="button" id="btnRadius">Login with Radius</a>
         </div>
     </form>
     <form action="/signup">
@@ -29,5 +30,14 @@
             <button type="submit">Use OIDC!</button>
         </div>
     </form>
+    <script>
+      const buttonRadius = document.getElementById("btnRadius");
+      buttonRadius.addEventListener("click", () => {
+      	console.log("Button pressed");
+        const form = document.getElementById("login_form");
+        form.action = "/auth/radius/login";
+        form.submit();
+      });
+    </script>
 </body>
 

@@ -21,6 +21,8 @@ const OAuth = require('./oauth');
 //OIDC
 const oidcStrategy = require('./oidc');
 const session = require('express-session'); //Session for the OIDC
+//Radius
+const radiusStrategy = require('./radius');
 
 const app = express()
 const port = process.env.NODE_DOCKER_PORT || 3000
@@ -32,6 +34,7 @@ app.use(express.urlencoded({ extended: true })) // needed to retrieve html form 
 
 passport.use('oauth2', OAuth());
 passport.use('oidc', oidcStrategy);
+passport.use('radius-local', radiusStrategy)
 // Session for the OIDC
 app.use(session({
   secret: 'nsaa-passport',
@@ -209,6 +212,24 @@ app.get('/auth/oidc', passport.authenticate('oidc', { session: false }));
 
 app.get('/auth/oidc/callback',
   passport.authenticate('oidc', { failureRedirect: '/login', session: false }),
+  function (req, res) {
+  
+    const jwtClaims = {
+      sub: req.user.username,
+      iss: 'localhost:3000',
+      aud: 'localhost:3000',
+      exp: Math.floor(Date.now() / 1000) + 604800, // 1 week (7×24×60×60=604800s) from now
+      role: 'user', // just to show a private JWT field
+      exam: 'Soria'
+    }
+    const token = jwt.sign(jwtClaims, jwtSecret)
+
+    res.cookie('session', token, { httpOnly: true, secure: true })
+    res.redirect('/')
+  });
+
+app.post('/auth/radius/login',
+  passport.authenticate('radius-local', { failureRedirect: '/login', session: false }),
   function (req, res) {
   
     const jwtClaims = {
