@@ -1,4 +1,6 @@
 #!/bin/bash
+# Stoping freeradius just in case
+sudo systemctl stop freeradius && \
 
 # To allow radius to read all the files, we copy them outside home directory and give permissions.
 sudo cp ca/private/server.key.pem /etc/ssl/private/server.key.pem && \
