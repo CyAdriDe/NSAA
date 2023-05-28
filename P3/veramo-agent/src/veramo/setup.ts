@@ -57,12 +57,12 @@ export const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataS
     }),
     new DIDManager({
       store: new DIDStore(dbConnection),
-      defaultProvider: 'did:ethr:rinkeby',  
+      defaultProvider: 'did:ethr:sepolia',  
       providers: {
-        'did:ethr:rinkeby': new EthrDIDProvider({
+        'did:ethr:sepolia': new EthrDIDProvider({
           defaultKms: 'local',
-          network: 'rinkeby',
-          rpcUrl: 'https://rinkeby.infura.io/v3/' + INFURA_API_KEY,
+          network: 'sepolia',
+          rpcUrl: 'https://sepolia.infura.io/v3/' + INFURA_API_KEY,
         }),
         'did:web': new WebDIDProvider({  // Just an axample of other providers
           defaultKms: 'local',
