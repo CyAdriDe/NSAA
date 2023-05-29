@@ -20,6 +20,9 @@ const bodyParser = require('body-parser');
 const OAuth = require('./oauth');
 //OIDC
 const oidcStrategy = require('./oidc');
+//This is for google
+//const oidcClient = require('./oidc-google');
+//const OpenIDConnectStrategy = require('passport-openidconnect').Strategy;
 const session = require('express-session'); //Session for the OIDC
 //Radius
 const radiusStrategy = require('./radius');
@@ -39,9 +42,19 @@ passport.use('radius-local', radiusStrategy)
 app.use(session({
   secret: 'nsaa-passport',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false
 }))
 
+//passport.use('oidc-google', new OpenIDConnectStrategy({
+//    client: oidcClient,
+//    usePKCE: false // We are using standard Authorization Code Grant. We do not need PKCE.
+//  }, (tokenSet, userInfo, done) => {
+//    console.log(tokenSet, userInfo)
+//    if (tokenSet === undefined || userInfo === undefined) {
+//      return done('no tokenSet or userInfo')
+//    }
+//    return done(null, userInfo)
+//  }))
 
 passport.use('hashed-passwords', 
 	new LocalStrategy(
@@ -190,6 +203,7 @@ app.get('/auth/github', passport.authenticate('oauth2', { session: false, scope:
 app.get('/auth/github/callback',
   passport.authenticate('oauth2', { failureRedirect: '/login', session: false }),
   function (req, res) {
+    console.log(req.user);
     // This is what ends up in our JWT
     const jwtClaims = {
       sub: req.user.username,
@@ -227,6 +241,26 @@ app.get('/auth/oidc/callback',
     res.cookie('session', token, { httpOnly: true, secure: true })
     res.redirect('/')
   });
+
+//app.get('/auth/oidc-google', passport.authenticate('oidc-google', { scope: 'openid email' }));
+
+//app.get('/auth/oidc-google/callback',
+//  passport.authenticate('oidc-google', { failureRedirect: '/login', session: false }),
+//  function (req, res) {
+  
+//    const jwtClaims = {
+//      sub: req.user.email,
+//      iss: 'localhost:3000',
+//      aud: 'localhost:3000',
+//      exp: Math.floor(Date.now() / 1000) + 604800, // 1 week (7×24×60×60=604800s) from now
+//      role: 'user', // just to show a private JWT field
+//      exam: 'Soria'
+//    }
+//    const token = jwt.sign(jwtClaims, jwtSecret)
+
+//    res.cookie('session', token, { httpOnly: true, secure: true })
+//    res.redirect('/')
+//  });
 
 app.post('/auth/radius/login',
   passport.authenticate('radius-local', { failureRedirect: '/login', session: false }),
